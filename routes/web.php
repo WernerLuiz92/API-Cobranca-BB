@@ -16,3 +16,21 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('token', 'App\Http\Controllers\APIController@token')
+->name('token');
+
+Route::get('register', 'App\Http\Controllers\APIController@register')
+->name('registrar');
+
+Route::get('listAll', 'App\Http\Controllers\APIController@listAll')
+->name('listarTodas');
+
+Route::get('findOne', 'App\Http\Controllers\APIController@findOne')
+->name('consultar');
+
+Route::get('writeOff', 'App\Http\Controllers\APIController@writeOff')
+->name('darBaixa');
+
+Route::get('update', 'App\Http\Controllers\APIController@update')
+->name('atualizar');
