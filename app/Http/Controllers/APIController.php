@@ -54,7 +54,7 @@ class APIController extends Controller
     public function register()
     {
         /* Informações do boleto */
-        $payLoad = [
+        $body = [
             'numeroConvenio' => 3128557,
             'numeroCarteira' => 17,
             'numeroVariacaoCarteira' => 35,
@@ -88,7 +88,7 @@ class APIController extends Controller
         ];
 
         /* Converte array em Json */
-        $payLoad = json_encode($payLoad);
+        $body = json_encode($body);
 
         try {
             $guzzle = new Client([
@@ -102,9 +102,11 @@ class APIController extends Controller
             /* Requisição */
             $response = $guzzle->request(
                 'POST',
-                'https://api.hm.bb.com.br/cobrancas/v2/boletos?gw-dev-app-key='.config('apiCobranca.gw_dev_app_key'),
+                'https://api.hm.bb.com.br/cobrancas/v2/boletos'
+                .'?gw-dev-app-key='
+                .config('apiCobranca.gw_dev_app_key'),
                 [
-                    'body' => $payLoad,
+                    'body' => $body,
                 ]
             );
 
@@ -165,7 +167,7 @@ class APIController extends Controller
 
     public function findOne()
     {
-        $id = '00031285579999990003';
+        $id = '00031285579999990004';
 
         try {
             $guzzle = new Client([
@@ -200,13 +202,97 @@ class APIController extends Controller
         }
     }
 
-    public function writeOff()
-    {
-        dd('Teste rota writeOff OK');
-    }
-
     public function update()
     {
-        dd('Teste rota update OK');
+        $id = '00031285579999990004';
+
+        /* Dados a serem alterados */
+        $body = [
+            'numeroConvenio' => 3128557,
+            'indicadorNovaDataVencimento' => 'S',
+            'alteracaoData' => [
+                'novaDataVencimento' => '05.04.2021',
+            ],
+        ];
+
+        /* Converte array em Json */
+        $body = json_encode($body);
+
+        try {
+            $guzzle = new Client([
+                'headers' => [
+                    'Authorization' => 'Bearer '.$this->token(),
+                    'Content-Type' => 'application/json',
+                ],
+                'verify' => false,
+            ]);
+
+            /* Requisição */
+            $response = $guzzle->request(
+                'PATCH',
+                'https://api.hm.bb.com.br/cobrancas/v2/boletos/'
+                .$id
+                .'?gw-dev-app-key='
+                .config('apiCobranca.gw_dev_app_key'),
+                [
+                    'body' => $body,
+                ]
+            );
+
+            /* Recuperar o corpo da resposta da requisição */
+            $body = $response->getBody();
+
+            /* Acessar os dados da resposta - JSON */
+            $contents = $body->getContents();
+
+            /* Converter o JSON em um array associativo PHP */
+            $boleto = json_decode($contents);
+
+            dd($boleto);
+        } catch (ClientException $e) {
+            echo $e->getResponse()->getBody();
+        }
+    }
+
+    public function terminate()
+    {
+        $id = '00031285579999990003';
+
+        try {
+            $guzzle = new Client([
+                'headers' => [
+                    'Authorization' => 'Bearer '.$this->token(),
+                    'Content-Type' => 'application/json',
+                ],
+                'verify' => false,
+            ]);
+
+            /* Requisição */
+            $response = $guzzle->request(
+                'POST',
+                'https://api.hm.bb.com.br/cobrancas/v2/boletos/'
+                .$id
+                .'/baixar'
+                .'?gw-dev-app-key='.config('apiCobranca.gw_dev_app_key'),
+                [
+                    'body' => json_encode([
+                        'numeroConvenio' => 3128557,
+                    ]),
+                ],
+            );
+
+            /* Recuperar o corpo da resposta da requisição */
+            $body = $response->getBody();
+
+            /* Acessar os dados da resposta - JSON */
+            $contents = $body->getContents();
+
+            /* Converter o JSON em um array associativo PHP */
+            $boleto = json_decode($contents);
+
+            dd($boleto);
+        } catch (ClientException $e) {
+            echo $e->getResponse()->getBody();
+        }
     }
 }
