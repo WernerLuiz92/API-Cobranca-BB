@@ -29,7 +29,7 @@ Route::get('listAll', 'App\Http\Controllers\APIController@listAll')
 Route::get('findOne', 'App\Http\Controllers\APIController@findOne')
 ->name('consultar');
 
-Route::get('writeOff', 'App\Http\Controllers\APIController@writeOff')
+Route::get('terminate', 'App\Http\Controllers\APIController@terminate')
 ->name('darBaixa');
 
 Route::get('update', 'App\Http\Controllers\APIController@update')
